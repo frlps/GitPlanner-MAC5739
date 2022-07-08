@@ -28,11 +28,11 @@
     (:action git-add-new
         :parameters (?f - file)
         :precondition (and 
-            (untracked ?f - file)
+            (untracked ?f)
         )
         :effect (and
-            (staged ?f - file)
-            (not (untracked ?f - file))
+            (not (untracked ?f))
+            (staged ?f)
         )
     )
 
@@ -40,10 +40,10 @@
     (:action git-add
         :parameters (?f - file)
         :precondition (and 
-            (modified-in-workspace ?f - file)
+            (modified-in-workspace ?f)
         )
         :effect (and
-            (staged ?f - file)
+            (staged ?f)
         )
     )
     
@@ -51,10 +51,10 @@
     (:action git-rm
         :parameters (?f - file)
         :precondition (and 
-            (committed ?f - file)
+            (deleted-in-workspace ?f)
         )
         :effect (and
-            (deleted-in-workspace ?f - file)
+            (staged ?f)
         )
     )
     
@@ -62,11 +62,12 @@
     (:action git-checkout
         :parameters (?f - file)
         :precondition (and 
-            (committed ?f - file)
-            (modified-in-workspace ?f - file)
+            (committed ?f)
         )
         :effect (and
-            (clean ?f - file))
+            (clean ?f)
+            (not (staged ?f))
+            (not (modified-in-workspace ?f))
         )
     )
     
@@ -74,35 +75,36 @@
     (:action git-reset
         :parameters (?f - file)
         :precondition (and 
-            (staged ?f - file)
-            (modified-in-workspace ?f - file)
+            (staged ?f)
         )
         :effect (and
-            (not (staged ?f - file))
+            (modified-in-workspace ?f)
+            (not (staged ?f))
         )
     )
     
     ;; git reset -- <new-file>
     (:action git-reset-new
-        :parameters (?f - file)
+        :parameters (?f)
         :precondition (and 
-            (staged ?f - file)
+            (staged ?f)
         )
         :effect (and
-            (untracked ?f - file)
-            (not (staged ?f - file))
+            (untracked ?f)
+            (not (staged ?f))
         )
     )
 
     ;; git commit <file>
     (:action git-commit
-        :parameters (?f - file)
+        :parameters (?f)
         :precondition (and 
-            (staged ?f - file)
+            (staged ?f)
         )
         :effect (and
-            (committed ?f - file)
-            (clean ?f - file)
+            (clean ?f)
+            (not (staged ?f))
+            (committed ?f)
         )
     )
 )
